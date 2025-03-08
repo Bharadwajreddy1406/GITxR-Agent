@@ -1,6 +1,8 @@
 # Environment variables
 .env
 
+.venv
+.cadence
 # Python
 __pycache__/
 *.py[cod]
