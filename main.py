@@ -1,16 +1,35 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import os
+import requests
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def list_repositories(username):
+    # Optionally use a GitHub token for authenticated requests
+    token = os.getenv("GITHUB_TOKEN")
+    headers = {"Authorization": f"token {token}"} if token else {}
+
+    # GitHub API endpoint to list user repositories
+    url = f"https://api.github.com/users/{username}/repos"
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        repos_data = response.json()
+        # Extract repository names dynamically
+        # print(repos_data)  be shocked if u un comment and run this
+        repos = [repo['name'] for repo in repos_data]
+        return repos
+    else:
+        print(f"Error {response.status_code}: {response.text}")
+        return []
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+if __name__ == "__main__":
+    # Prompt the user for a GitHub username
+    username = input("Enter a GitHub username: ").strip()
+    repositories = list_repositories(username)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    if repositories:
+        print(f"\nRepositories for user '{username}':")
+        for repo in repositories:
+            print(f"- {repo}")
+    else:
+        print("No repositories found or an error occurred.")
