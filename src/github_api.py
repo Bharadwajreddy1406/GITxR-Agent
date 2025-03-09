@@ -91,10 +91,15 @@ class GitHubAPIClient:
         issues = self.get_issues(owner, repo, state)
         return len(issues)
     
-    def search_repositories(self, query: str, sort: str = "stars", order: str = "desc", count: int = 10) -> List[Dict]:
+    def search_repositories(self, query: str, sort: str = "stars", order: str = "desc", count: int = 10) -> Dict:
         """Search for repositories across GitHub."""
         results = self._get("/search/repositories", {"q": query, "sort": sort, "order": order, "per_page": count})
-        return results
+        return results  # This should return the full response object (a dict), not just the items
+
+    def get_user_repositories(self, username: str) -> List[Dict]:
+        """Get all repositories for a specific user."""
+        return self._get(f"/users/{username}/repos")
+
     def get_workflow_runs(self, owner: str, repo: str, workflow_id: str, count: int = 10) -> List[Dict]:
         """Get workflow runs for a specific workflow."""
         return self._get(f"/repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs", {"per_page": count})

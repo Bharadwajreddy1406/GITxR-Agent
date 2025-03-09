@@ -36,10 +36,7 @@
 
 from src.github_api import GitHubAPIClient
 from src.data_processing import DataProcessor
+from src.cli import main
 
-
-client = GitHubAPIClient()
-data_guy = DataProcessor()
-res = client.get_recent_merged_prs(owner="Bharadwajreddy1406",repo="TypeScript-shadcn-components")
-tables = data_guy.pull_requests_to_dataframe(res)
-print(tables)
+if __name__ == "__main__":
+    main()
