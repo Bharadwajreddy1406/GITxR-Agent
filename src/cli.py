@@ -5,6 +5,7 @@ import argparse
 import pandas as pd
 import json
 import traceback
+import re
 
 from .github_api import GitHubAPIClient
 from .llm_client import LLMClient
@@ -38,6 +39,24 @@ class GitXRCLI:
         
         return intent_params.get(intent, {})
     
+    def extract_username_from_input(self, input_text: str) -> str:
+        """Extract just the username from user input that might contain a full query."""
+        # If input contains "of username" pattern, extract username
+        match = re.search(r'of\s+([^\s]+)', input_text.lower())
+        if match:
+            return match.group(1)
+            
+        # If it's a simple input without spaces, assume it's already just a username
+        if ' ' not in input_text:
+            return input_text
+            
+        # Try splitting by spaces and take the last word as username
+        words = input_text.split()
+        if words:
+            return words[-1]
+            
+        return input_text  # Return original if no pattern matched
+    
     def validate_and_complete_params(self, intent: str, params: Any) -> Dict:
         """Check if all required parameters are present and prompt for missing ones."""
         required_params = self.get_required_params(intent)
@@ -54,6 +73,12 @@ class GitXRCLI:
             if param_name not in updated_params or not updated_params.get(param_name):
                 self.console.print(f"[bold yellow]Missing required parameter:[/bold yellow] {param_desc}")
                 param_value = self.console.input(f"Please provide the {param_name} ({param_desc}): ")
+                
+                # Special handling for usernames
+                if param_name == 'username':
+                    param_value = self.extract_username_from_input(param_value)
+                    self.console.print(f"[blue]Using username:[/blue] {param_value}")
+                
                 updated_params[param_name] = param_value
                 
                 # Update conversation history to include this parameter
