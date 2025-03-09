@@ -59,6 +59,7 @@ class GitHubAPIClient:
     def get_weekly_commits(self, owner: str, repo: str) -> int:
         """Count commits from the past week."""
         commit_activity = self._get(f"/repos/{owner}/{repo}/stats/commit_activity")
+        # print(commit_activity)
         return commit_activity[0]['total'] if commit_activity else 0
     
     def get_pull_requests(self, owner: str, repo: str, state: str = "all", count: int = 10) -> List[Dict]:
